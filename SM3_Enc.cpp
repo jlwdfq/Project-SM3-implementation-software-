@@ -15,27 +15,27 @@
 using namespace std;
 
 
-//´úÂëÎÄ¼şËµÃ÷,Ê¹ÓÃSM3¶ÔÊäÈëÎÄ±¾½øĞĞ¼ÓÃÜ
+//ä»£ç æ–‡ä»¶è¯´æ˜,ä½¿ç”¨SM3å¯¹è¾“å…¥æ–‡æœ¬è¿›è¡ŒåŠ å¯†
 #define MAX_NUM 1024*1024
 #define MAXSIZE 1024*MAX_NUM
 
-//Éè¶¨¼ÓÃÜÎÄ¼şµÄ×î´ó×Ö½ÚÊıÎª4KB
-//³¬¹ı¸Ã×Ö½ÚÊı£¬¸Ã³ÌĞò»á×Ô¶¯½øĞĞ·Ö¿é
-//·ÖÎªÈô¸ÉÎÄ±¾Æ¬¶Î½øĞĞ·Ö±ğ¼ÓÃÜ
+//è®¾å®šåŠ å¯†æ–‡ä»¶çš„æœ€å¤§å­—èŠ‚æ•°ä¸º4KB
+//è¶…è¿‡è¯¥å­—èŠ‚æ•°ï¼Œè¯¥ç¨‹åºä¼šè‡ªåŠ¨è¿›è¡Œåˆ†å—
+//åˆ†ä¸ºè‹¥å¹²æ–‡æœ¬ç‰‡æ®µè¿›è¡Œåˆ†åˆ«åŠ å¯†
 
 
 unsigned int hash_result = 0;
-//×ÜµÄÏûÏ¢¿é
+//æ€»çš„æ¶ˆæ¯å—
 unsigned int Rate_of_hash = 0;
-//µ±Ç°ÒÑ¾­¼ÆËãÍê³ÉhashµÄÎÄ±¾Êı¾İ±ÈÀı
+//å½“å‰å·²ç»è®¡ç®—å®Œæˆhashçš„æ–‡æœ¬æ•°æ®æ¯”ä¾‹
 
 
 
 static const int endianTest = 1;
 #define IsLittleEndian() (*(char *)&endianTest == 1)
-//Ê×ÏÈ³ÌĞòĞèÒªÅĞ¶ÏÔËĞĞ»·¾³ÊÇ·ñÎªĞ¡¶Ë
+//é¦–å…ˆç¨‹åºéœ€è¦åˆ¤æ–­è¿è¡Œç¯å¢ƒæ˜¯å¦ä¸ºå°ç«¯
 #define LeftRotate(word, bits) ( (word) << (bits) | (word) >> (32 - (bits)) )
-//×ñÑ­sm3µÄ±ê×¼¼ÓÃÜ·½°¸£¬Ïò×óÑ­»·ÒÆÎ»£¬Í¬Ê±·´×ªËÄ×Ö½ÚÕûĞÍ×Ö½ÚĞò
+//éµå¾ªsm3çš„æ ‡å‡†åŠ å¯†æ–¹æ¡ˆï¼Œå‘å·¦å¾ªç¯ç§»ä½ï¼ŒåŒæ—¶åè½¬å››å­—èŠ‚æ•´å‹å­—èŠ‚åº
 
 unsigned int* Reverse_word(unsigned int* word)
 {
@@ -52,7 +52,7 @@ unsigned int* Reverse_word(unsigned int* word)
 	return word;
 
 }
-//½ÓÏÂÀ´·Ö±ğÊµÏÖsm3µÄ¸÷¸ö²¿¼ş
+//æ¥ä¸‹æ¥åˆ†åˆ«å®ç°sm3çš„å„ä¸ªéƒ¨ä»¶
 //T
 unsigned int T(int i)
 {
@@ -98,7 +98,7 @@ unsigned int P1(unsigned int X)
 	return X ^ LeftRotate(X, 15) ^ LeftRotate(X, 23);
 }
 
-//¶Ôsm3½øĞĞ³õÊ¼»¯º¯Êı
+//å¯¹sm3è¿›è¡Œåˆå§‹åŒ–å‡½æ•°
 void SM3_Init(SM3::SM3Context* context) {
 	context->intermediateHash[0] = 0x7380166F;
 	context->intermediateHash[1] = 0x4914B2B9;
@@ -110,7 +110,7 @@ void SM3_Init(SM3::SM3Context* context) {
 	context->intermediateHash[7] = 0xB0FB0E4E;
 }
 
-// ¶ÔinputµÄÎÄ±¾½øĞĞ·Ö¿é´¦Àí
+// å¯¹inputçš„æ–‡æœ¬è¿›è¡Œåˆ†å—å¤„ç†
 void SM3_dealwith_MessageBlock(SM3::SM3Context* context)
 {
 	int i;
@@ -135,6 +135,13 @@ void SM3_dealwith_MessageBlock(SM3::SM3Context* context)
 	for (i = 0; i < 64; i++)
 	{
 		W_[i] = W[i] ^ W[i + 4];
+	}
+	if (i < 12) {
+		W[i + 4] = *(unsigned int*)(context->messageBlock + (i + 4) * 4);
+		if (IsLittleEndian())	ReverseWord(W + i + 4);
+	}
+	else {
+		W[i + 4] = ((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 15) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 23)) ^ LeftRotate(W[i - 9], 7) ^ W[i - 2];
 	}
 
 	//message compression
@@ -177,10 +184,10 @@ void SM3_dealwith_MessageBlock(SM3::SM3Context* context)
 }
 
 /*
-* SM3ÔËËãµÄÖ÷Ìå¹ı³Ì:
-	message´ú±íĞèÒª¼ÓÃÜµÄÏûÏ¢×Ö½Ú´®;
-	messagelenÊÇÏûÏ¢µÄ×Ö½ÚÊı;
-	digset±íÊ¾·µ»ØµÄ¹şÏ£Öµ
+* SM3è¿ç®—çš„ä¸»ä½“è¿‡ç¨‹:
+	messageä»£è¡¨éœ€è¦åŠ å¯†çš„æ¶ˆæ¯å­—èŠ‚ä¸²;
+	messagelenæ˜¯æ¶ˆæ¯çš„å­—èŠ‚æ•°;
+	digsetè¡¨ç¤ºè¿”å›çš„å“ˆå¸Œå€¼
 */
 unsigned char* SM3::SM3Calc(const unsigned char* message,
 	unsigned int messageLen, unsigned char digest[SM3_HASH_SIZE])
@@ -190,50 +197,50 @@ unsigned char* SM3::SM3Calc(const unsigned char* message,
 
 	SM3_Init(&context);
 	hash_result = messageLen / 64 + 1;
-	//¼ÆËã×Ü¿éÊı
+	//è®¡ç®—æ€»å—æ•°
 	remainder = messageLen % 64;
 	if (remainder > 111) {
 		hash_result += 1;
-		//mod64Ö®ºóÈç¹û´óÓÚ111£¬ËµÃ÷³¬³öÁË4KB£¬ÎÒÃÇĞèÒª¶îÍâÒ»¿é½øĞĞÏûÏ¢Ìî³ä
-		//×Ü¿éÊı»¹Òª+1
+		//mod64ä¹‹åå¦‚æœå¤§äº111ï¼Œè¯´æ˜è¶…å‡ºäº†4KBï¼Œæˆ‘ä»¬éœ€è¦é¢å¤–ä¸€å—è¿›è¡Œæ¶ˆæ¯å¡«å……
+		//æ€»å—æ•°è¿˜è¦+1
 	}
-	//¶ÔÇ°ÃæµÄÏûÏ¢·Ö×é½øĞĞ´¦Àí 
+	//å¯¹å‰é¢çš„æ¶ˆæ¯åˆ†ç»„è¿›è¡Œå¤„ç† 
 	for (i = 0; i < messageLen / 64; i++)
 	{
 		memcpy(context.messageBlock, message + i * 64, 64);
 		Rate_of_hash = i + 1;
-		//Ã¿´¦ÀíÒ»¸ö512bitµÄÏûÏ¢¿é£¬½ø¶È¾Í+1
+		//æ¯å¤„ç†ä¸€ä¸ª512bitçš„æ¶ˆæ¯å—ï¼Œè¿›åº¦å°±+1
 		SM3_dealwith_MessageBlock(&context);
 	}
 
-	//Ìî³äÏûÏ¢·Ö×é£¬²¢´¦Àí 
+	//å¡«å……æ¶ˆæ¯åˆ†ç»„ï¼Œå¹¶å¤„ç† 
 	bitLen = messageLen * 8;
 	if (IsLittleEndian())
 		ReverseWord(&bitLen);
 	memcpy(context.messageBlock, message + i * 64, remainder);
 	context.messageBlock[remainder] = 0x80;
-	//Ìí¼Óbit¡®0x1000 0000¡¯µ½Ä©Î²
+	//æ·»åŠ bitâ€˜0x1000 0000â€™åˆ°æœ«å°¾
 	if (remainder <= 111)
 	{
-		//³¤¶È°´ÕÕ´ó¶Ë·¨Õ¼8¸ö×Ö½Ú£¬Ö»¿¼ÂÇ³¤¶ÈÔÚ 2^32 - 1(bit)ÒÔÄÚµÄÇé¿ö£¬
-		//¹Ê½«¸ß 4 ¸ö×Ö½Ú¸³Îª 0 
+		//é•¿åº¦æŒ‰ç…§å¤§ç«¯æ³•å 8ä¸ªå­—èŠ‚ï¼Œåªè€ƒè™‘é•¿åº¦åœ¨ 2^32 - 1(bit)ä»¥å†…çš„æƒ…å†µï¼Œ
+		//æ•…å°†é«˜ 4 ä¸ªå­—èŠ‚èµ‹ä¸º 0 
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
-		Rate_of_hash += 1;//¼ÆËã×îºóÒ»¸ö¶Ì¿é
+		Rate_of_hash += 1;//è®¡ç®—æœ€åä¸€ä¸ªçŸ­å—
 		SM3_dealwith_MessageBlock(&context);
 	}
 	else
 	{
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
 		hash_rate += 1;
-		//¼ÆËãÎÒ¶îÍâÌí¼ÓµÄ¶Ì¿é
+		//è®¡ç®—æˆ‘é¢å¤–æ·»åŠ çš„çŸ­å—
 		SM3_dealwith_MessageBlock(&context);
-		//³¤¶È°´ÕÕ´ó¶Ë·¨Õ¼8¸ö×Ö½Ú£¬Ö»¿¼ÂÇ³¤¶ÈÔÚ 2^32 - 1(bit)ÒÔÄÚµÄÇé¿ö£¬
-		//¹Ê½«¸ß 4 ¸ö×Ö½Ú¸³Îª 0 
+		//é•¿åº¦æŒ‰ç…§å¤§ç«¯æ³•å 8ä¸ªå­—èŠ‚ï¼Œåªè€ƒè™‘é•¿åº¦åœ¨ 2^32 - 1(bit)ä»¥å†…çš„æƒ…å†µï¼Œ
+		//æ•…å°†é«˜ 4 ä¸ªå­—èŠ‚èµ‹ä¸º 0 
 		memset(context.messageBlock, 0, 64 - 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
 		Rate_of_hash += 1;
-		//¼ÆËã×îºóÒ»¸ö¶Ì¿é
+		//è®¡ç®—æœ€åä¸€ä¸ªçŸ­å—
 		SM3_dealwith_MessageBlock(&context);
 	}
 	if (IsLittleEndian())
@@ -244,16 +251,16 @@ unsigned char* SM3::SM3Calc(const unsigned char* message,
 }
 
 /*
-* call_hash_sm3º¯Êı
-	ÊäÈë²ÎÊı£ºÎÄ¼şµØÖ·×Ö·û´®
-	Êä³ö£ºÏòÁ¿vector<unit32_t> hash_result(32)
+* call_hash_sm3å‡½æ•°
+	è¾“å…¥å‚æ•°ï¼šæ–‡ä»¶åœ°å€å­—ç¬¦ä¸²
+	è¾“å‡ºï¼šå‘é‡vector<unit32_t> hash_result(32)
 */
 std::vector<uint32_t> SM3::call_hash_sm3(char* filepath)
 {
 	std::vector<uint32_t> hash_result(32, 0);
 	std::ifstream infile;
 	uint32_t FILESIZE = 0;
-	//½øĞĞÎÄ¼ş²Ù×÷£¬½«¸ÃÎÄ¼ş×÷ÎªÎÄ±¾Êı¾İ´ı¼ÓÃÜ
+	//è¿›è¡Œæ–‡ä»¶æ“ä½œï¼Œå°†è¯¥æ–‡ä»¶ä½œä¸ºæ–‡æœ¬æ•°æ®å¾…åŠ å¯†
 	unsigned char* buffer = new unsigned char[MAXSIZE];
 	unsigned char hash_output[32];
 	struct _stat info;
@@ -265,7 +272,7 @@ std::vector<uint32_t> SM3::call_hash_sm3(char* filepath)
 	auto start = std::chrono::high_resolution_clock::now();
 	SM3::SM3Calc(buffer, FILESIZE, hash_output);
 	auto end = std::chrono::high_resolution_clock::now();
-	// ÒÔºÁÃëÎªµ¥Î»£¬·µ»ØËùÓÃÊ±¼ä
+	// ä»¥æ¯«ç§’ä¸ºå•ä½ï¼Œè¿”å›æ‰€ç”¨æ—¶é—´
 	std::cout << "in millisecond time:";
 	std::chrono::duration<double, std::ratio<1, 1000>> diff = end - start;
 	std::cout << "Time is " << diff.count() << " ms\n";
@@ -274,13 +281,13 @@ std::vector<uint32_t> SM3::call_hash_sm3(char* filepath)
 	return hash_result;
 }
 
-//¶Ôµ±Ç°µÄ¹şÏ£½ø¶È½øĞĞ¼ÆËãÓë·´À¡
+//å¯¹å½“å‰çš„å“ˆå¸Œè¿›åº¦è¿›è¡Œè®¡ç®—ä¸åé¦ˆ
 double progress() {
 	return (double(Rate_of_hash) / hash_result);
 }
 
-//´´½¨¹Ì¶¨´óĞ¡µÄÎÄ¼ş
-void CreatTxt(char* pathName, int length)//´´½¨txtÎÄ¼ş
+//åˆ›å»ºå›ºå®šå¤§å°çš„æ–‡ä»¶
+void CreatTxt(char* pathName, int length)//åˆ›å»ºtxtæ–‡ä»¶
 {
 	ofstream fout(pathName);
 	char char_list[] = "abcdefghijklmnopqrstuvwxyz";
@@ -289,12 +296,12 @@ void CreatTxt(char* pathName, int length)//´´½¨txtÎÄ¼ş
 		for (int i = 0; i < length; i++)
 		{
 			fout << char_list[rand() % n]; 
-			// Ê¹ÓÃºÍÊä³öÁ÷Í¬ÑùµÄ·½Ê½½øĞĞĞ´Èë
+			// ä½¿ç”¨å’Œè¾“å‡ºæµåŒæ ·çš„æ–¹å¼è¿›è¡Œå†™å…¥
 		}
 
 		fout.close();  
-		// Ö´ĞĞÍê²Ù×÷ºó¹Ø±ÕÎÄ¼ş¾ä±ú£¬
-		//Ò»¶¨ÒªĞ´ÕâÒ»¾ä£¬·ñÔòÏÂ´ÎÔËĞĞµÄÊ±ºò»á³öÏÖÎÊÌâ
+		// æ‰§è¡Œå®Œæ“ä½œåå…³é—­æ–‡ä»¶å¥æŸ„ï¼Œ
+		//ä¸€å®šè¦å†™è¿™ä¸€å¥ï¼Œå¦åˆ™ä¸‹æ¬¡è¿è¡Œçš„æ—¶å€™ä¼šå‡ºç°é—®é¢˜
 	}
 }
 int main() {
@@ -308,6 +315,6 @@ int main() {
 	}
 	std::cout << std::endl;
 	double rate = progress();
-	printf("\nµ±Ç°½ø¶È: %f", rate);
+	printf("\nå½“å‰è¿›åº¦: %f", rate);
 	return 0;
 }
