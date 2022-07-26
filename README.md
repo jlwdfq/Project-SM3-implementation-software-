@@ -95,7 +95,7 @@ SM3的每个部件的相关实现
 
 五.SM3算法部分优化方向
 -
-优化思路相关参考上传的SM3_Reference.pdf文件中的优化思路
+优化思路相关参考上传的SM3_Reference.pdf文件与参考资料【5】中的优化思路
 
 **优化方向一：消息扩展的快速实现**
 
@@ -144,3 +144,5 @@ SM3的每个部件的相关实现
 【3】SM3加密算法详解（2021-12-8）： https://blog.csdn.net/qq_40662424/article/details/121637732
 
 【4】SM3百度百科： https://baike.baidu.com/item/SM3/4421797?fr=aladdin
+
+【5】SM3密码杂凑算法--＞大文件做摘要优化： https://blog.csdn.net/oprim/article/details/124179928
