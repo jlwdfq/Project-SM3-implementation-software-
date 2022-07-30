@@ -136,6 +136,7 @@ SM3的每个部件的相关实现
 -
 ![图片](https://user-images.githubusercontent.com/107350922/181876361-b6b2ebe0-8143-4321-bffb-8787dce00d94.png)
 
+![图片](https://user-images.githubusercontent.com/107350922/181879352-f83e41ce-2a27-47ae-abf4-f19cdf3ee064.png)
 
 **参考资料：**
 -
