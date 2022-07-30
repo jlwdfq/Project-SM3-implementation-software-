@@ -136,6 +136,8 @@ SM3的每个部件的相关实现
 -
 ![图片](https://user-images.githubusercontent.com/107350922/181876361-b6b2ebe0-8143-4321-bffb-8787dce00d94.png)
 
+如下图所示，在加入上面的优化方法后，对比初始实现方案与openssl中的sm3库的运行效率，算法的运行效率得到了提高，但仍然与标准库函数的运行效率有一定的差距
+
 ![图片](https://user-images.githubusercontent.com/107350922/181879404-fefeeec0-511e-4f33-ba60-1eaf0320a0f6.png)
 
 **参考资料：**
