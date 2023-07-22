@@ -15,7 +15,6 @@
 using namespace std;
 
 
-//代码文件说明,使用SM3对输入文本进行加密
 #define MAX_NUM 1024*1024
 #define MAXSIZE 1024*MAX_NUM
 
