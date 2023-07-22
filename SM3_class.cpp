@@ -1,7 +1,5 @@
 #define SM3_HASH_SIZE 32
-//实现思路为先将SM3 hash标准输入输出
-//作为一个单独的变量类型写为结构体的形式
-//为方便后续的调用我们可以单独将该class作为一个头文件进行调用
+
 
 namespace SM3 {
 	//先标记一个hash vector 拥有的字节数。
